@@ -3,21 +3,227 @@ import { Head } from 'mdx-deck'
 export { default as theme } from './theme'
 
 <Head>
-  <title>Presentation Title</title>
+  <title>Pattern matching in TS</title>
 </Head>
 
-# Hello
+# Pattern matching in TS
 
 ---
 
-## Edit this file
-
-To create your presentation
+## What's pattern matching?
 
 ```notes
-- Create speaker notes in fenced code blocks
+It makes sense to start defining what is it
 ```
 
 ---
 
-<https://github.com/jxnblk/mdx-deck>
+```re
+let str = "hola";
+
+let result =
+  switch(str) {
+  | "hola" => "HOLA"
+  | "chau" => "bye!"
+  | _ => "..."
+  };
+```
+
+---
+
+```elm
+num : Int
+num = 1
+
+result : String
+result = 
+  case num of
+    1 -> "one"
+    2 -> "two"
+    _ -> "other"
+```
+
+---
+
+```haskell
+map :: (a -> b) -> [a] -> [b]
+map _ []     = []
+map f (x:xs) = f x : map f xs
+```
+
+---
+
+```elm
+type alias State = Int
+
+type Action
+  = Inc
+  | Dec
+
+reducer : State -> Action -> State
+reducer state action =
+  case action of
+    Inc -> state + 1
+    Dec -> state - 1
+```
+
+---
+
+```elm
+type alias State = Int
+
+type Action
+  = Inc
+  | Dec
+  | Add Int
+
+reducer : State -> Action -> State
+reducer state action =
+  case action of
+    Inc -> state + 1
+    Dec -> state - 1
+    Add x -> state + x
+```
+
+---
+
+## We can only hope ...
+
+<https://github.com/tc39/proposal-pattern-matching>
+
+---
+
+## Meanwhile ...
+
+---
+
+```js
+const fn = R.cond([
+  [R.equals(0),   R.always('water freezes at 0°C')],
+  [R.equals(100), R.always('water boils at 100°C')],
+  [R.T,           t => `nothing special happens at ${t}°C`],
+])
+
+fn(0)   // => 'water freezes at 0°C'
+fn(50)  // => 'nothing special happens at 50°C'
+fn(100) // => 'water boils at 100°C'
+```
+
+<https://ramdajs.com/docs/#cond>
+
+```notes
+- NOT type safe
+- Very limited
+```
+
+---
+
+## What about TypeScript?
+
+```notes
+Doesn't support pattern matching per se but ...
+```
+
+---
+
+## Many approaches
+
+(list them)
+
+---
+
+<https://github.com/housinganywhere/match>
+
+---
+
+```ts
+import match from '@housinganywhere/match'
+
+type Variant =
+  | 'success'
+  | 'danger'
+  | 'warning'
+
+const variantColor = match<Variant, string>({
+  success: () => 'green',
+  danger: () => 'red',
+  warning: () => 'yellow',
+})
+```
+
+---
+
+```ts
+import * as React from 'react'
+import match from '@housinganywhere/match'
+
+const enum PayoutTypes {
+  Iban = 'iban',
+  Bank = 'bank',
+  Paypal = 'paypal',
+}
+
+const PayoutMethod = ({ payoutMethod, payoutType }) => 
+  <div>
+    {match<PayoutTypes, React.ReactNode>({
+      [PayoutTypes.Iban]: () => (
+        <IbanMethod method={payoutMethod} isNew={!payoutMethod} />
+      ),
+      [PayoutTypes.Bank]: () => (
+        <BankMethod method={payoutMethod} isNew={!payoutMethod} />
+      ),
+      [PayoutTypes.Paypal]: () => (
+        <PaypalMethod method={payoutMethod} isNew={!payoutMethod} />
+      ),
+    })(payoutType)}
+  </div>
+```
+
+---
+
+<iframe
+  src="https://codesandbox.io/embed/o9y2mrx5k9"
+  style={{ width:'95vw', height: '95vh', border: 0, borderRadius: 4, overflow:'hidden' }}
+  sandbox="allow-modals allow-forms allow-popups allow-scripts allow-same-origin"
+/>
+
+---
+
+```ts
+type RemoteData<D, E> =
+  | NotAsked
+  | Loading
+  | Success<D>
+  | Failure<E>
+```
+
+<https://github.com/gillchristian/remote-data-ts>
+
+---
+
+```tsx
+const renderArticle = cata<Article, string, React.ReactNode>({
+  notAsked: () => <Idle />,
+  loading: () => <Spinner />,
+  success: (article) => <Article {...article} />,
+  error: (msg) => <Msg variant="danger">{msg}</Msg>,
+})
+```
+
+---
+
+<iframe
+  src="https://codesandbox.io/embed/kx6q84nk5o"
+  style={{ width:'95vw', height: '95vh', border: 0, borderRadius: 4, overflow:'hidden' }}
+  sandbox="allow-modals allow-forms allow-popups allow-scripts allow-same-origin"
+/>
+
+---
+
+<https://housinganywhere.com>
+
+<https://github.com/gillchristian>
+
+---
+
+# THE END
