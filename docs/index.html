@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset='utf-8'>
+<meta name='viewport' content='width=device-width,initial-scale=1'>
+<style>*{box-sizing:border-box}body{font-family:system-ui,sans-serif;margin:0}</style>
+<meta name='generator' content='mdx-deck'>
+<title data-head="true">Pattern matching in TS</title><style data-styled-components="hsARDy kmKUJZ gKaMTo zIEGn CAuLq vIzDp byfFmt lkIJBD gtCLgp kPOGYN elpTsf cXgiMa eCoqJu kaUAEP gtARdA hOCGEu fbxTAJ bNhvRs">
+/* sc-component-id: sc-bdVaJa */
+.sc-bdVaJa {} .eCoqJu{display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;-webkit-box-pack:center;-webkit-justify-content:center;-ms-flex-pack:center;justify-content:center;margin-bottom:8px;margin-left:auto;margin-right:auto;} @media print{.eCoqJu{display:none;}}
+/* sc-component-id: sc-bwzfXH */
+.sc-bwzfXH {} .kaUAEP{-webkit-appearance:none;-moz-appearance:none;appearance:none;border:4px solid transparent;background-clip:padding-box;border-radius:9999px;width:8px;height:8px;color:inherit;opacity:0.5;margin:0px;padding:4px;color:#000;background-color:#000;} .kaUAEP:focus{outline:none;box-shadow:0 0 0 1px;}.gtARdA{-webkit-appearance:none;-moz-appearance:none;appearance:none;border:4px solid transparent;background-clip:padding-box;border-radius:9999px;width:8px;height:8px;color:inherit;opacity:0.125;margin:0px;padding:4px;color:#000;background-color:#000;} .gtARdA:focus{outline:none;box-shadow:0 0 0 1px;}
+/* sc-component-id: sc-htpNat */
+.sc-htpNat {} .cXgiMa{position:fixed;left:0;right:0;bottom:0;}
+/* sc-component-id: sc-bxivhb */
+.sc-bxivhb {} .fbxTAJ{cursor:pointer;width:64px;height:100vh;}
+/* sc-component-id: sc-ifAKCX */
+.sc-ifAKCX {} .hOCGEu{position:fixed;top:0;left:0;bottom:0;}
+/* sc-component-id: sc-EHOje */
+.sc-EHOje {} .bNhvRs{position:fixed;top:0;right:0;bottom:0;}
+/* sc-component-id: sc-bZQynM */
+.sc-bZQynM {} .kmKUJZ{overflow-x:hidden;width:100%;height:100%;} @media print{.kmKUJZ{height:auto;overflow-x:visible;}}
+/* sc-component-id: sc-gzVnrw */
+.sc-gzVnrw {} .gKaMTo{display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;width:100%;height:100%;-webkit-transition-property:-webkit-transform;-webkit-transition-property:transform;transition-property:transform;-webkit-transition-timing-function:ease-out;transition-timing-function:ease-out;-webkit-transition-duration:.3s;transition-duration:.3s;-webkit-transform:translate3d(0%,0,0);-ms-transform:translate3d(0%,0,0);transform:translate3d(0%,0,0);} @media print{.gKaMTo{height:auto;display:block;}}
+/* sc-component-id: sc-htoDjs */
+.sc-htoDjs {} .zIEGn{-webkit-flex:none;-ms-flex:none;flex:none;display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;-webkit-align-items:center;-webkit-box-align:center;-ms-flex-align:center;align-items:center;-webkit-box-pack:center;-webkit-justify-content:center;-ms-flex-pack:center;justify-content:center;-webkit-flex-direction:column;-ms-flex-direction:column;flex-direction:column;overflow:hidden;width:100%;height:100%;padding-left:32px;padding-right:32px;} @media print{.zIEGn{width:100vw;height:100vh;page-break-after:always;page-break-inside:avoid;-webkit-print-color-adjust:exact;}} @media screen and (min-width:40em){.zIEGn{padding-left:64px;padding-right:64px;}} @media screen and (min-width:52em){.zIEGn{padding-left:128px;padding-right:128px;}}
+/* sc-component-id: sc-dnqmqq */
+.sc-dnqmqq {} .hsARDy{font-family:system-ui,sans-serif;font-size:16px;text-align:center;width:100vw;height:100vh;color:#000;background-color:white;} @media print{.hsARDy{font-size:24px;height:auto;}} @media screen and (min-width:64em){.hsARDy{font-size:32px;}}
+/* sc-component-id: sc-jzJRlG */
+.sc-jzJRlG {} .vIzDp{line-height:1.25;font-size:3em;margin-bottom:16px;margin-top:16px;color:heading;}
+/* sc-component-id: sc-cSHVUG */
+.sc-cSHVUG {}
+/* sc-component-id: sc-kAzzGY */
+.sc-kAzzGY {} .lkIJBD{line-height:1.25;font-size:2em;margin-bottom:16px;margin-top:16px;color:heading;}
+/* sc-component-id: sc-chPdSV */
+.sc-chPdSV {}
+/* sc-component-id: sc-kEYyzF */
+.sc-kEYyzF {} .elpTsf{color:#07c;}
+/* sc-component-id: sc-kkGfuU */
+.sc-kkGfuU {} .kPOGYN{font-size:1.5em;}
+/* sc-component-id: sc-jWBwVP */
+.sc-jWBwVP {} .gtCLgp{font-family:Menlo,monospace;text-align:left;white-space:pre-wrap;font-size:1em;margin:0px;padding:8px;color:#f0f;background-color:#333;}</style>
+</head>
+<body>
+<div id=root><div><div class="sc-dnqmqq hsARDy" mode="NORMAL" step="0" width="100vw" height="100vh" color="text"><div class="sc-bZQynM kmKUJZ"><div class="sc-gzVnrw gKaMTo"><div class="sc-htoDjs zIEGn"><div><h1 class="sc-cSHVUG CAuLq sc-jzJRlG vIzDp" font-size="4" color="heading">Pattern matching in TS</h1></div></div><div class="sc-htoDjs zIEGn"><div><h2 class="sc-chPdSV byfFmt sc-kAzzGY lkIJBD" font-size="3" color="heading">What&#x27;s pattern matching?</h2></div></div><div class="sc-htoDjs zIEGn"><div><pre class="language-re sc-jWBwVP gtCLgp" font-size="1" color="pre">let str = &quot;hola&quot;;
+
+let result =
+  switch(str) {
+  | &quot;hola&quot; =&gt; &quot;HOLA&quot;
+  | &quot;chau&quot; =&gt; &quot;bye!&quot;
+  | _ =&gt; &quot;...&quot;
+  };
+</pre></div></div><div class="sc-htoDjs zIEGn"><div><pre class="language-elm sc-jWBwVP gtCLgp" font-size="1" color="pre">num : Int
+num = 1
+
+result : String
+result = 
+  case num of
+    1 -&gt; &quot;one&quot;
+    2 -&gt; &quot;two&quot;
+    _ -&gt; &quot;other&quot;
+</pre></div></div><div class="sc-htoDjs zIEGn"><div><pre class="language-haskell sc-jWBwVP gtCLgp" font-size="1" color="pre">map :: (a -&gt; b) -&gt; [a] -&gt; [b]
+map _ []     = []
+map f (x:xs) = f x : map f xs
+</pre></div></div><div class="sc-htoDjs zIEGn"><div><pre class="language-elm sc-jWBwVP gtCLgp" font-size="1" color="pre">type alias State = Int
+
+type Action
+  = Inc
+  | Dec
+
+reducer : State -&gt; Action -&gt; State
+reducer state action =
+  case action of
+    Inc -&gt; state + 1
+    Dec -&gt; state - 1
+</pre></div></div><div class="sc-htoDjs zIEGn"><div><pre class="language-elm sc-jWBwVP gtCLgp" font-size="1" color="pre">type alias State = Int
+
+type Action
+  = Inc
+  | Dec
+  | Add Int
+
+reducer : State -&gt; Action -&gt; State
+reducer state action =
+  case action of
+    Inc -&gt; state + 1
+    Dec -&gt; state - 1
+    Add x -&gt; state + x
+</pre></div></div><div class="sc-htoDjs zIEGn"><div><h2 class="sc-chPdSV byfFmt sc-kAzzGY lkIJBD" font-size="3" color="heading">We can only hope ...</h2><p class="sc-kkGfuU kPOGYN" font-size="2"><a class="sc-kEYyzF elpTsf" href="https://github.com/tc39/proposal-pattern-matching" color="link">https://github.com/tc39/proposal-pattern-matching</a></p></div></div><div class="sc-htoDjs zIEGn"><div><h2 class="sc-chPdSV byfFmt sc-kAzzGY lkIJBD" font-size="3" color="heading">Meanwhile ...</h2></div></div><div class="sc-htoDjs zIEGn"><div><pre class="language-js sc-jWBwVP gtCLgp" font-size="1" color="pre">const fn = R.cond([
+  [R.equals(0),   R.always(&#x27;water freezes at 0°C&#x27;)],
+  [R.equals(100), R.always(&#x27;water boils at 100°C&#x27;)],
+  [R.T,           t =&gt; `nothing special happens at ${t}°C`],
+])
+
+fn(0)   // =&gt; &#x27;water freezes at 0°C&#x27;
+fn(50)  // =&gt; &#x27;nothing special happens at 50°C&#x27;
+fn(100) // =&gt; &#x27;water boils at 100°C&#x27;
+</pre><p class="sc-kkGfuU kPOGYN" font-size="2"><a class="sc-kEYyzF elpTsf" href="https://ramdajs.com/docs/#cond" color="link">https://ramdajs.com/docs/#cond</a></p></div></div><div class="sc-htoDjs zIEGn"><div><h2 class="sc-chPdSV byfFmt sc-kAzzGY lkIJBD" font-size="3" color="heading">What about TypeScript?</h2></div></div><div class="sc-htoDjs zIEGn"><div><h2 class="sc-chPdSV byfFmt sc-kAzzGY lkIJBD" font-size="3" color="heading">Many approaches</h2><p class="sc-kkGfuU kPOGYN" font-size="2">(list them)</p></div></div><div class="sc-htoDjs zIEGn"><div><p class="sc-kkGfuU kPOGYN" font-size="2"><a class="sc-kEYyzF elpTsf" href="https://github.com/housinganywhere/match" color="link">https://github.com/housinganywhere/match</a></p></div></div><div class="sc-htoDjs zIEGn"><div><pre class="language-ts sc-jWBwVP gtCLgp" font-size="1" color="pre">import match from &#x27;@housinganywhere/match&#x27;
+
+type Variant =
+  | &#x27;success&#x27;
+  | &#x27;danger&#x27;
+  | &#x27;warning&#x27;
+
+const variantColor = match&lt;Variant, string&gt;({
+  success: () =&gt; &#x27;green&#x27;,
+  danger: () =&gt; &#x27;red&#x27;,
+  warning: () =&gt; &#x27;yellow&#x27;,
+})
+</pre></div></div><div class="sc-htoDjs zIEGn"><div><pre class="language-ts sc-jWBwVP gtCLgp" font-size="1" color="pre">import * as React from &#x27;react&#x27;
+import match from &#x27;@housinganywhere/match&#x27;
+
+const enum PayoutTypes {
+  Iban = &#x27;iban&#x27;,
+  Bank = &#x27;bank&#x27;,
+  Paypal = &#x27;paypal&#x27;,
+}
+
+const PayoutMethod = ({ payoutMethod, payoutType }) =&gt; 
+  &lt;div&gt;
+    {match&lt;PayoutTypes, React.ReactNode&gt;({
+      [PayoutTypes.Iban]: () =&gt; (
+        &lt;IbanMethod method={payoutMethod} isNew={!payoutMethod} /&gt;
+      ),
+      [PayoutTypes.Bank]: () =&gt; (
+        &lt;BankMethod method={payoutMethod} isNew={!payoutMethod} /&gt;
+      ),
+      [PayoutTypes.Paypal]: () =&gt; (
+        &lt;PaypalMethod method={payoutMethod} isNew={!payoutMethod} /&gt;
+      ),
+    })(payoutType)}
+  &lt;/div&gt;
+</pre></div></div><div class="sc-htoDjs zIEGn"><div><iframe src="https://codesandbox.io/embed/o9y2mrx5k9" style="width:95vw;height:95vh;border:0;border-radius:4px;overflow:hidden" sandbox="allow-modals allow-forms allow-popups allow-scripts allow-same-origin"></iframe></div></div><div class="sc-htoDjs zIEGn"><div><pre class="language-ts sc-jWBwVP gtCLgp" font-size="1" color="pre">type RemoteData&lt;D, E&gt; =
+  | NotAsked
+  | Loading
+  | Success&lt;D&gt;
+  | Failure&lt;E&gt;
+</pre><p class="sc-kkGfuU kPOGYN" font-size="2"><a class="sc-kEYyzF elpTsf" href="https://github.com/gillchristian/remote-data-ts" color="link">https://github.com/gillchristian/remote-data-ts</a></p></div></div><div class="sc-htoDjs zIEGn"><div><pre class="language-tsx sc-jWBwVP gtCLgp" font-size="1" color="pre">const renderArticle = cata&lt;Article, string, React.ReactNode&gt;({
+  notAsked: () =&gt; &lt;Idle /&gt;,
+  loading: () =&gt; &lt;Spinner /&gt;,
+  success: (article) =&gt; &lt;Article {...article} /&gt;,
+  error: (msg) =&gt; &lt;Msg variant=&quot;danger&quot;&gt;{msg}&lt;/Msg&gt;,
+})
+</pre></div></div><div class="sc-htoDjs zIEGn"><div><iframe src="https://codesandbox.io/embed/kx6q84nk5o" style="width:95vw;height:95vh;border:0;border-radius:4px;overflow:hidden" sandbox="allow-modals allow-forms allow-popups allow-scripts allow-same-origin"></iframe></div></div><div class="sc-htoDjs zIEGn"><div><p class="sc-kkGfuU kPOGYN" font-size="2"><a class="sc-kEYyzF elpTsf" href="https://housinganywhere.com" color="link">https://housinganywhere.com</a></p><p class="sc-kkGfuU kPOGYN" font-size="2"><a class="sc-kEYyzF elpTsf" href="https://github.com/gillchristian" color="link">https://github.com/gillchristian</a></p></div></div><div class="sc-htoDjs zIEGn"><div><h1 class="sc-cSHVUG CAuLq sc-jzJRlG vIzDp" font-size="4" color="heading">THE END</h1></div></div></div></div></div></div><div class="sc-htpNat cXgiMa"><div class="sc-bdVaJa eCoqJu"><button class="sc-bwzfXH kaUAEP" title="go to: 0" color="text"></button><button class="sc-bwzfXH gtARdA" title="go to: 1" color="text"></button><button class="sc-bwzfXH gtARdA" title="go to: 2" color="text"></button><button class="sc-bwzfXH gtARdA" title="go to: 3" color="text"></button><button class="sc-bwzfXH gtARdA" title="go to: 4" color="text"></button><button class="sc-bwzfXH gtARdA" title="go to: 5" color="text"></button><button class="sc-bwzfXH gtARdA" title="go to: 6" color="text"></button><button class="sc-bwzfXH gtARdA" title="go to: 7" color="text"></button><button class="sc-bwzfXH gtARdA" title="go to: 8" color="text"></button><button class="sc-bwzfXH gtARdA" title="go to: 9" color="text"></button><button class="sc-bwzfXH gtARdA" title="go to: 10" color="text"></button><button class="sc-bwzfXH gtARdA" title="go to: 11" color="text"></button><button class="sc-bwzfXH gtARdA" title="go to: 12" color="text"></button><button class="sc-bwzfXH gtARdA" title="go to: 13" color="text"></button><button class="sc-bwzfXH gtARdA" title="go to: 14" color="text"></button><button class="sc-bwzfXH gtARdA" title="go to: 15" color="text"></button><button class="sc-bwzfXH gtARdA" title="go to: 16" color="text"></button><button class="sc-bwzfXH gtARdA" title="go to: 17" color="text"></button><button class="sc-bwzfXH gtARdA" title="go to: 18" color="text"></button><button class="sc-bwzfXH gtARdA" title="go to: 19" color="text"></button><button class="sc-bwzfXH gtARdA" title="go to: 20" color="text"></button></div></div><div class="sc-ifAKCX hOCGEu sc-bxivhb fbxTAJ" role="button" title="Previous Slide"></div><div class="sc-EHOje bNhvRs sc-bxivhb fbxTAJ" role="button" title="Next Slide"></div></div>
+<script src="main.js"></script>
+</body>
+</html>
