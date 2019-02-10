@@ -1,19 +1,20 @@
 {
+  "name": "pattern-matching-ts",
   "private": true,
   "version": "1.0.0",
-  "description": "Deck created with mdx-deck",
+  "description": "Pattern matching in TS workshop",
   "scripts": {
-    "start": "mdx-deck deck.mdx",
+    "start": "serve ./docs --single",
+    "dev": "mdx-deck deck.mdx",
     "build": "mdx-deck build deck.mdx -d docs",
     "pdf": "mdx-deck pdf deck.mdx",
     "image": "mdx-deck screenshot deck.mdx",
     "help": "mdx-deck"
   },
-  "keywords": [],
-  "author": "Brent Jackson",
+  "author": "Christian Gill",
   "license": "MIT",
-  "devDependencies": {
-    "mdx-deck": "^1.6.7"
-  },
-  "name": "non-binary-data"
+  "dependencies": {
+    "mdx-deck": "^1.6.7",
+    "serve": "^10.1.2"
+  }
 }
