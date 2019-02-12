@@ -1,6 +1,6 @@
 import { book as theme } from "mdx-deck/themes";
 
-import style from "react-syntax-highlighter/styles/prism/twilight";
+import style from "react-syntax-highlighter/styles/prism/darcula";
 
 import rust from "react-syntax-highlighter/languages/prism/rust";
 import go from "react-syntax-highlighter/languages/prism/go";
