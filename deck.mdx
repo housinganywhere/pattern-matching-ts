@@ -18,15 +18,106 @@ It makes sense to start defining what is it
 
 ---
 
-```re
+```reason
 let str = "hola";
 
 let result =
   switch(str) {
   | "hola" => "HOLA"
   | "chau" => "bye!"
-  | _ => "..."
+  | _      => "..."
   };
+```
+
+```notes
+Many languages have it.
+
+In reason it's called `switch`.
+```
+
+---
+
+```scala
+import scala.util.Random
+
+val x: Int = Random.nextInt(10)
+
+x match {
+  case 0 => "zero"
+  case 1 => "one"
+  case 2 => "two"
+  case _ => "many"
+}
+```
+
+```notes
+In Scala it's called `match`
+```
+
+---
+
+```scala
+sealed abstract class Furniture
+case class Couch() extends Furniture
+case class Chair() extends Furniture
+
+def findPlaceToSit(piece: Furniture): String = piece match {
+  case a: Couch => "Lie on the couch"
+  case b: Chair => "Sit on the chair"
+}
+```
+
+```notes
+Also works on types (classes)
+```
+
+---
+
+```csharp
+public static double ComputeAreaModernSwitch(object shape)
+{
+    switch (shape)
+    {
+        case Square s:
+            return s.Side * s.Side;
+        case Circle c:
+            return c.Radius * c.Radius * Math.PI;
+        case Rectangle r:
+            return r.Height * r.Length;
+        default:
+            throw new ArgumentException(
+                message: "shape is not a recognized shape",
+                paramName: nameof(shape));
+    }
+}
+```
+
+---
+
+```go
+func do(i interface{}) {
+	switch v := i.(type) {
+	case int:
+		fmt.Printf("Twice %v is %v\\n", v, v*2)
+	case string:
+		fmt.Printf("%q is %v bytes long\\n", v, len(v))
+	default:
+		fmt.Printf("I don't know about type %T!\\n", v)
+	}
+}
+```
+
+---
+
+```rust
+let x = Some(5);
+let y = 10;
+
+match x {
+    Some(50) => println!("Got 50"),
+    Some(y)  => println!("Matched, y = {:?}", y),
+    _        => println!("Default case, x = {:?}", x),
+}
 ```
 
 ---
@@ -43,6 +134,10 @@ result =
     _ -> "other"
 ```
 
+```notes
+`case x of` in Elm and Haskell
+```
+
 ---
 
 ```haskell
@@ -51,20 +146,31 @@ map _ []     = []
 map f (x:xs) = f x : map f xs
 ```
 
+<a href="https://bit.ly/2TPWg57" target="_blank">Source</a>
+
+```notes
+Haskell also supports pattern matching on the function parameters.
+
+Combined with destructuring it results in very declarative functions.
+```
+
 ---
 
 ```elm
 type alias State = Int
 
-type Action
-  = Inc
-  | Dec
+type Action = Inc | Dec
 
 reducer : State -> Action -> State
 reducer state action =
   case action of
     Inc -> state + 1
     Dec -> state - 1
+```
+
+```notes
+We can also pattern match on custom types
+(i.e. union types)
 ```
 
 ---
@@ -85,6 +191,18 @@ reducer state action =
     Add x -> state + x
 ```
 
+```notes
+This is the end goal !!!
+```
+
+---
+
+## What about JavScript and TypeScript?
+
+```notes
+This is all cool but we write JavaScript !!!
+```
+
 ---
 
 ## We can only hope ...
@@ -93,7 +211,48 @@ reducer state action =
 
 ---
 
-## Meanwhile ...
+```js
+const res = await fetch(jsonService)
+case (res) {
+  when {status: 200, headers: {'Content-Length': s}} -> {
+    console.log(`size is ${s}`)
+  }
+  when {status: 404} -> {
+    console.log('JSON not found')
+  }
+  when {status} if (status >= 400) -> {
+    throw new RequestError(res)
+  }
+}
+```
+
+---
+
+```jsx
+<Fetch url={API_URL}>{
+  props => case (props) {
+    when {loading} -> <Loading />
+    when {error} -> <Error error={error} />
+    when {data} -> <Page data={data} />
+    when _ -> throw new Error('badmatch')
+  }
+}
+</Fetch>
+```
+
+---
+
+## On the mean time ...
+
+<img src="https://media1.giphy.com/media/1rOUXIDg1XaHSdlLxZ/giphy.gif?cid=3640f6095c620b1b4758337167e5f390" />
+
+```notes
+It seems cool! So what can we do now?
+
+They don't support pattern matching "per se" ...
+
+BUT !!! 
+```
 
 ---
 
@@ -112,16 +271,10 @@ fn(100) // => 'water boils at 100°C'
 <https://ramdajs.com/docs/#cond>
 
 ```notes
+Yeah, Ramda, of course
+
 - NOT type safe
-- Very limited
-```
-
----
-
-## What about TypeScript?
-
-```notes
-Doesn't support pattern matching per se but ...
+- Already useful, but still limited
 ```
 
 ---
@@ -130,9 +283,10 @@ Doesn't support pattern matching per se but ...
 
 (list them)
 
----
-
-<https://github.com/housinganywhere/match>
+<https://blog.carbonfive.com/2018/01/08/an-introduction-to-adts-and-structural-pattern-matching-in-typescript>
+<https://pattern-matching-with-typescript.alabor.me>
+<https://blog.logrocket.com/pattern-matching-and-type-safety-in-typescript-1da1231a2e34>
+<https://blog.parametricstudios.com/posts/pattern-matching-custom-data-types>
 
 ---
 
@@ -151,32 +305,31 @@ const variantColor = match<Variant, string>({
 })
 ```
 
+<https://github.com/housinganywhere/match>
+
 ---
 
 ```ts
-import * as React from 'react'
-import match from '@housinganywhere/match'
-
-const enum PayoutTypes {
-  Iban = 'iban',
-  Bank = 'bank',
-  Paypal = 'paypal',
-}
+type PayoutTypes = 'iban' | 'bank' | 'paypal'
 
 const PayoutMethod = ({ payoutMethod, payoutType }) => 
   <div>
     {match<PayoutTypes, React.ReactNode>({
-      [PayoutTypes.Iban]: () => (
+      iban: () => (
         <IbanMethod method={payoutMethod} isNew={!payoutMethod} />
       ),
-      [PayoutTypes.Bank]: () => (
+      bank: () => (
         <BankMethod method={payoutMethod} isNew={!payoutMethod} />
       ),
-      [PayoutTypes.Paypal]: () => (
+      paypal: () => (
         <PaypalMethod method={payoutMethod} isNew={!payoutMethod} />
       ),
     })(payoutType)}
   </div>
+```
+
+```notes
+There are a few things missing here!
 ```
 
 ---
@@ -201,7 +354,7 @@ type RemoteData<D, E> =
 
 ---
 
-```tsx
+```ts
 const renderArticle = cata<Article, string, React.ReactNode>({
   notAsked: () => <Idle />,
   loading: () => <Spinner />,
