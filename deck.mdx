@@ -92,6 +92,10 @@ public static double ComputeAreaModernSwitch(object shape)
 }
 ```
 
+```notes
+C# (not only FP langs)
+```
+
 ---
 
 ```go
@@ -107,6 +111,10 @@ func do(i interface{}) {
 }
 ```
 
+```notes
+Go has something for types
+```
+
 ---
 
 ```rust
@@ -118,6 +126,10 @@ match x {
     Some(y)  => println!("Matched, y = {:?}", y),
     _        => println!("Default case, x = {:?}", x),
 }
+```
+
+```notes
+Rust
 ```
 
 ---
@@ -169,8 +181,9 @@ reducer state action =
 ```
 
 ```notes
-We can also pattern match on custom types
-(i.e. union types)
+We can also pattern match on Algebraic Data Types
+
+(i.e. custom types / union types)
 ```
 
 ---
@@ -186,8 +199,8 @@ type Action
 reducer : State -> Action -> State
 reducer state action =
   case action of
-    Inc -> state + 1
-    Dec -> state - 1
+    Inc   -> state + 1
+    Dec   -> state - 1
     Add x -> state + x
 ```
 
@@ -279,6 +292,19 @@ Yeah, Ramda, of course
 
 ---
 
+```js
+// static/js/ui/Chip.js
+
+const createIcon = R.cond([
+  [React.isValidElement, R.identity],
+  [R.is(String), name => <SvgIcon name={name} />],
+  [R.is(Object), props => <SvgIcon {...props} />],
+  [R.T, () => null],
+])
+```
+
+---
+
 ## Many approaches
 
 (list them)
@@ -287,6 +313,16 @@ Yeah, Ramda, of course
 <https://pattern-matching-with-typescript.alabor.me>
 <https://blog.logrocket.com/pattern-matching-and-type-safety-in-typescript-1da1231a2e34>
 <https://blog.parametricstudios.com/posts/pattern-matching-custom-data-types>
+
+```notes
+I'm not the first one to talk about this
+
+Of course !!!
+
+But I'm not satisfied =/
+
+TOO much boilerplate, more than acceptable
+```
 
 ---
 
@@ -307,9 +343,32 @@ const variantColor = match<Variant, string>({
 
 <https://github.com/housinganywhere/match>
 
+```notes
+Et voilà !
+```
+
 ---
 
 ```ts
+import { wildMatch } from '@housinganywhere/match';
+
+type Vowels = 'a' | 'e' | 'i' | 'o' | 'u';
+
+const isA = wildMatch<Vowels, string>({
+  a: () => 'Yay!',
+  _: (v) => `Nope, "${v}" is not "a"`,
+});
+```
+
+```notes
+This one is not published yet ...
+
+What about the name ?
+```
+
+---
+
+```jsx
 type PayoutTypes = 'iban' | 'bank' | 'paypal'
 
 const PayoutMethod = ({ payoutMethod, payoutType }) => 
@@ -329,7 +388,45 @@ const PayoutMethod = ({ payoutMethod, payoutType }) =>
 ```
 
 ```notes
-There are a few things missing here!
+`match` and `wildMatch` are generic
+
+Still limiting !!!
+
+What about pattern matching on data ?
+```
+
+---
+
+```ts
+type Matcher<T extends string, R> = { [K in T]: (k: K) => R };
+
+const match = <T extends string, R = void>(m: Matcher<T, R>) => (t: T) => m[t](t);
+```
+
+```notes
+Yeah, implementation is that simple !!!
+```
+---
+
+```ts
+type PartialMatcher<T extends string, R> =
+  { [K in T]?: (k: K) => R } & { _: (t: T) => R; };
+
+const wildMatch = <T extends string, R = void>(m: PartialMatcher<T, R>) => (t: T) => {
+  const f = m[t];
+  if (f) {
+    return f(t);
+  }
+
+  return m._(t);
+};
+```
+
+```notes
+Even the `wildMatch` one is very simple!
+
+This gives already and idea of what we can do
+to get the data in the `case` function.
 ```
 
 ---
@@ -339,6 +436,12 @@ There are a few things missing here!
   style={{ width:'95vw', height: '95vh', border: 0, borderRadius: 4, overflow:'hidden' }}
   sandbox="allow-modals allow-forms allow-popups allow-scripts allow-same-origin"
 />
+
+```notes
+TODO: build from scratch !!!!
+
+Already have the API but not the implementation !!!
+```
 
 ---
 
