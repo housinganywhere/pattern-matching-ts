@@ -1,12 +1,22 @@
-import { Head } from 'mdx-deck'
+import { Head, Image } from 'mdx-deck'
 
 export { default as theme } from './theme'
+
+import Link from './components/Link'
+import Split from './components/Split'
 
 <Head>
   <title>Pattern matching in TS</title>
 </Head>
 
 # Pattern matching in TS
+
+<span>
+  <Link href="https://gillchristian.xyz" external>gillchristian</Link>
+  { ' @ ' }
+  <Link href="https://github.com/housinganywhere" external>HousingAnywhere</Link>
+</span>
+
 
 ---
 
@@ -18,16 +28,27 @@ It makes sense to start defining what is it
 
 ---
 
-```reason
-let str = "hola";
+## "Checking a value against a pattern"
 
-let result =
-  switch(str) {
-  | "hola" => "HOLA"
-  | "chau" => "bye!"
-  | _      => "..."
-  };
+---
+
+```reason
+switch("hola") {
+| "hola" => "HOLA"
+| "chau" => "bye!"
+| _      => "..."
+}; /* "HOLA" */
 ```
+
+```reason
+switch("other") {
+| "hola" => "HOLA"
+| "chau" => "bye!"
+| _      => "..."
+}; /* "..." */
+```
+
+export default Split
 
 ```notes
 Many languages have it.
@@ -158,12 +179,14 @@ map _ []     = []
 map f (x:xs) = f x : map f xs
 ```
 
-<a href="https://bit.ly/2TPWg57" target="_blank">Source</a>
+<Link href="https://bit.ly/2TPWg57" external>Source</Link>
 
 ```notes
 Haskell also supports pattern matching on the function parameters.
 
 Combined with destructuring it results in very declarative functions.
+
+(Yup it's the actual Haskell's map implementation)
 ```
 
 ---
@@ -178,6 +201,9 @@ reducer state action =
   case action of
     Inc -> state + 1
     Dec -> state - 1
+
+reducer 1 Inc -- 2
+reducer 1 Dec -- 0
 ```
 
 ```notes
@@ -204,13 +230,24 @@ reducer state action =
     Add x -> state + x
 ```
 
+```elm
+reducer 1 Inc       -- 2
+reducer 1 Dec       -- 0
+reducer 1 (Add 10)  -- 11
+reducer 1 (Add -10) -- -9
+```
+
+export default Split
+
 ```notes
 This is the end goal !!!
 ```
 
 ---
 
-## What about JavScript and TypeScript?
+<h2 align="center">What about JavaScript?</h2>
+
+<img src="https://media.giphy.com/media/3o7bu63eNwKf0KUmEo/giphy.gif" width="1000px" />
 
 ```notes
 This is all cool but we write JavaScript !!!
@@ -220,7 +257,21 @@ This is all cool but we write JavaScript !!!
 
 ## We can only hope ...
 
-<https://github.com/tc39/proposal-pattern-matching>
+<Link
+  href="https://github.com/tc39/proposal-pattern-matching"
+  size={3}
+  external
+>
+  tc39/proposal-pattern-matching
+</Link>
+
+<div style={{ marginTop: 50 }}>
+  <img src="https://media1.tenor.com/images/8a812348b181e255cdaf984cf180a265/tenor.gif?itemid=11136000" width="600px"/>
+</div>
+
+```notes
+PRETTY PLEASE !!!
+```
 
 ---
 
@@ -242,27 +293,37 @@ case (res) {
 ---
 
 ```jsx
-<Fetch url={API_URL}>{
-  props => case (props) {
+<Fetch url={API_URL}>
+  {props => case (props) {
     when {loading} -> <Loading />
     when {error} -> <Error error={error} />
     when {data} -> <Page data={data} />
     when _ -> throw new Error('badmatch')
-  }
-}
+  }}
 </Fetch>
+```
+
+```notes
+So, what do you guys think about this ?
+
+Useful or not ???
+
+Any thoughts ...
 ```
 
 ---
 
 ## On the mean time ...
 
-<img src="https://media1.giphy.com/media/1rOUXIDg1XaHSdlLxZ/giphy.gif?cid=3640f6095c620b1b4758337167e5f390" />
+<img
+  src="https://media1.giphy.com/media/1rOUXIDg1XaHSdlLxZ/giphy.gif?cid=3640f6095c620b1b4758337167e5f390"
+  width="600px"
+/>
 
 ```notes
 It seems cool! So what can we do now?
 
-They don't support pattern matching "per se" ...
+JS/TS support pattern matching "per se" ...
 
 BUT !!! 
 ```
@@ -281,13 +342,12 @@ fn(50)  // => 'nothing special happens at 50°C'
 fn(100) // => 'water boils at 100°C'
 ```
 
-<https://ramdajs.com/docs/#cond>
+<Link href="https://ramdajs.com/docs/#cond" external>
+  ramdajs.com/docs/#cond
+</Link>
 
 ```notes
 Yeah, Ramda, of course
-
-- NOT type safe
-- Already useful, but still limited
 ```
 
 ---
@@ -301,6 +361,14 @@ const createIcon = R.cond([
   [R.is(Object), props => <SvgIcon {...props} />],
   [R.T, () => null],
 ])
+```
+
+```notes
+BUT !!!
+
+- NOT type safe
+- Already useful, but still limited
+- And awkward ...
 ```
 
 ---
@@ -341,7 +409,13 @@ const variantColor = match<Variant, string>({
 })
 ```
 
-<https://github.com/housinganywhere/match>
+<Link
+  href="https://github.com/housinganywhere/match"
+  external
+  size={3}
+>
+  @housinganywhere/match
+</Link>
 
 ```notes
 Et voilà !
@@ -368,6 +442,44 @@ What about the name ?
 
 ---
 
+```ts
+type Matcher<T extends string, R> = { [K in T]: (k: K) => R };
+
+const match = <T extends string, R = void>(m: Matcher<T, R>) => (t: T) => m[t](t);
+```
+
+```notes
+Yeah, implementation is that simple !!!
+
+And it gives EXHAUSTIVENESS !!!
+```
+
+---
+
+```ts
+type PartialMatcher<T extends string, R> =
+  { [K in T]?: (k: K) => R } & { _: (t: T) => R; };
+
+const wildMatch = <T extends string, R = void>(m: PartialMatcher<T, R>) => (t: T) => {
+  const f = m[t];
+  if (f) {
+    return f(t);
+  }
+
+  return m._(t);
+};
+```
+
+<Link href="https://github.com/housinganywhere/match/pull/1" external>
+  PR #1
+</Link>
+
+```notes
+Even the `wildMatch` one is very simple!
+```
+
+---
+
 ```jsx
 type PayoutTypes = 'iban' | 'bank' | 'paypal'
 
@@ -388,59 +500,34 @@ const PayoutMethod = ({ payoutMethod, payoutType }) =>
 ```
 
 ```notes
-`match` and `wildMatch` are generic
+`match` and `wildMatch` work on
+enums and string unions
 
 Still limiting !!!
 
 What about pattern matching on data ?
+
+`wildMatch` -> idea -> data in cases
 ```
 
 ---
 
-```ts
-type Matcher<T extends string, R> = { [K in T]: (k: K) => R };
-
-const match = <T extends string, R = void>(m: Matcher<T, R>) => (t: T) => m[t](t);
-```
-
-```notes
-Yeah, implementation is that simple !!!
-```
----
-
-```ts
-type PartialMatcher<T extends string, R> =
-  { [K in T]?: (k: K) => R } & { _: (t: T) => R; };
-
-const wildMatch = <T extends string, R = void>(m: PartialMatcher<T, R>) => (t: T) => {
-  const f = m[t];
-  if (f) {
-    return f(t);
-  }
-
-  return m._(t);
-};
-```
-
-```notes
-Even the `wildMatch` one is very simple!
-
-This gives already and idea of what we can do
-to get the data in the `case` function.
-```
+<Link href="https://codesandbox.io/s/o9y2mrx5k9" external size={4}>
+  Code time !!!
+</Link>
 
 ---
 
-<iframe
-  src="https://codesandbox.io/embed/o9y2mrx5k9"
-  style={{ width:'95vw', height: '95vh', border: 0, borderRadius: 4, overflow:'hidden' }}
-  sandbox="allow-modals allow-forms allow-popups allow-scripts allow-same-origin"
-/>
+## So far we have ...
+
+`match<'foo' | 'bar'> // states`
+
+`match<{ name } | { email }> // data`
 
 ```notes
-TODO: build from scratch !!!!
+What else can we do ???
 
-Already have the API but not the implementation !!!
+Can we combine them somehow ???
 ```
 
 ---
@@ -453,32 +540,59 @@ type RemoteData<D, E> =
   | Failure<E>
 ```
 
-<https://github.com/gillchristian/remote-data-ts>
+<Link href="https://github.com/gillchristian/remote-data-ts" external size={3}>
+  gillchristian/remote-data-ts
+</Link>
 
 ---
 
 ```ts
 const renderArticle = cata<Article, string, React.ReactNode>({
-  notAsked: () => <Idle />,
-  loading: () => <Spinner />,
+  notAsked:       () => <Empty />,
+  loading:        () => <Spinner />,
   success: (article) => <Article {...article} />,
-  error: (msg) => <Msg variant="danger">{msg}</Msg>,
+  error:       (msg) => <Msg variant="danger">{msg}</Msg>,
 })
+```
+---
+
+Map (map, then)
+```ts
+// (A -> B) -> RD<A, E> -> RD<B, E>
+// (A -> B) -> A[]      -> B[]
+
+// Promise<A> -> (A -> B) -> Promise<B>
+
+<A, E, B>(fn: (d: A) => B) => (rd: RemoteData<A, E>) => RemoteData<B, E>;
 ```
 
 ---
 
-<iframe
-  src="https://codesandbox.io/embed/kx6q84nk5o"
-  style={{ width:'95vw', height: '95vh', border: 0, borderRadius: 4, overflow:'hidden' }}
-  sandbox="allow-modals allow-forms allow-popups allow-scripts allow-same-origin"
-/>
+Chain (then, flatMap)
+
+```ts
+// (A -> B[])      -> A[]      -> B[]
+// (A -> RD<B, E>) -> RD<A, E> -> RD<B, E>
+
+// Promise<A> -> (A -> Promise<B>) -> Promise<B>
+
+<D, E, R>(fn: (d: D) => RemoteData<R, E>) => (rd: RemoteData<D, E>) => RemoteData<R, E>;
+```
+
+Fold (withDefault)
+
+```ts
+<D, E, R>(fn: (d: D) => R) => (def: R) => (rd: RemoteData<D, E>) => R;
+```
+---
+
+<Link href="https://codesandbox.io/s/kx6q84nk5o" external size={4}>
+  Example
+</Link>
 
 ---
 
-<https://housinganywhere.com>
-
-<https://github.com/gillchristian>
+## Questions?
 
 ---
 
