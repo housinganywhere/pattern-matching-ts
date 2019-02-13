@@ -7,7 +7,7 @@
     "start": "serve ./docs --single",
     "dev": "mdx-deck deck.mdx",
     "build": "mdx-deck build deck.mdx -d docs",
-    "pdf": "mdx-deck pdf deck.mdx",
+    "pdf": "mdx-deck pdf deck.mdx -d . -o presentation.pdf",
     "image": "mdx-deck screenshot deck.mdx",
     "help": "mdx-deck"
   },
