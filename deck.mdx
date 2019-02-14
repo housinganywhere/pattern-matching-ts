@@ -23,12 +23,18 @@ import Split from './components/Split'
 ## What's pattern matching?
 
 ```notes
-It makes sense to start defining what is it
+Does someone know what it is?
+
+Let's define it ...
 ```
 
 ---
 
-## "Checking a value against a pattern"
+## Checking a value against a pattern
+
+---
+
+## Deconstruct value into parts
 
 ---
 
@@ -251,6 +257,10 @@ This is the end goal !!!
 
 ```notes
 This is all cool but we write JavaScript !!!
+
+Perfect gif:
+
+Nicki Minaj === JavaScript
 ```
 
 ---
@@ -323,7 +333,7 @@ Any thoughts ...
 ```notes
 It seems cool! So what can we do now?
 
-JS/TS support pattern matching "per se" ...
+JS/TS don't support pattern matching "per se" ...
 
 BUT !!! 
 ```
@@ -373,23 +383,17 @@ BUT !!!
 
 ---
 
-## Many approaches
-
-(list them)
-
-<https://blog.carbonfive.com/2018/01/08/an-introduction-to-adts-and-structural-pattern-matching-in-typescript>
-<https://pattern-matching-with-typescript.alabor.me>
-<https://blog.logrocket.com/pattern-matching-and-type-safety-in-typescript-1da1231a2e34>
-<https://blog.parametricstudios.com/posts/pattern-matching-custom-data-types>
+<Link
+  href="https://www.typescriptlang.org/docs/handbook/advanced-types.html#discriminated-unions"
+  external
+  size={6}
+>
+  Discriminated Unions
+</Link>
 
 ```notes
-I'm not the first one to talk about this
-
-Of course !!!
-
-But I'm not satisfied =/
-
-TOO much boilerplate, more than acceptable
+TypeScript gives use the tools to leverage the
+type system to implement pattern matching
 ```
 
 ---
@@ -404,7 +408,7 @@ type Variant =
 
 const variantColor = match<Variant, string>({
   success: () => 'green',
-  danger: () => 'red',
+  danger:  () => 'red',
   warning: () => 'yellow',
 })
 ```
@@ -420,26 +424,6 @@ const variantColor = match<Variant, string>({
 ```notes
 Et voilà !
 ```
-
----
-
-```ts
-import { wildMatch } from '@housinganywhere/match';
-
-type Vowels = 'a' | 'e' | 'i' | 'o' | 'u';
-
-const isA = wildMatch<Vowels, string>({
-  a: () => 'Yay!',
-  _: (v) => `Nope, "${v}" is not "a"`,
-});
-```
-
-```notes
-This one is not published yet ...
-
-What about the name ?
-```
-
 ---
 
 ```ts
@@ -452,6 +436,29 @@ const match = <T extends string, R = void>(m: Matcher<T, R>) => (t: T) => m[t](t
 Yeah, implementation is that simple !!!
 
 And it gives EXHAUSTIVENESS !!!
+```
+
+---
+
+```ts
+import { wildMatch } from '@housinganywhere/match';
+
+type Vowels = 'a' | 'e' | 'i' | 'o' | 'u';
+
+const isA = wildMatch<Vowels, string>({
+  a:  () => 'Yay!',
+  _: (v) => `Nope, "${v}" is not "a"`,
+});
+
+isA('a') // => 'Yay!'
+isA('e') // => 'Nope, "e" is not "a"'
+isA('u') // => 'Nope, "u" is not "a"'
+```
+
+```notes
+This one is not published yet ...
+
+What about the name ?
 ```
 
 ---
@@ -540,20 +547,38 @@ type RemoteData<D, E> =
   | Failure<E>
 ```
 
-<Link href="https://github.com/gillchristian/remote-data-ts" external size={3}>
-  gillchristian/remote-data-ts
-</Link>
+```notes
+One use case would be states/status
+of data that we fetch
+
+parametrize -> generic data
+```
 
 ---
 
 ```ts
+import { RemoteData, cata } from 'remote-data-ts'
+
 const renderArticle = cata<Article, string, React.ReactNode>({
   notAsked:       () => <Empty />,
   loading:        () => <Spinner />,
   success: (article) => <Article {...article} />,
   error:       (msg) => <Msg variant="danger">{msg}</Msg>,
 })
+
+renderArticle(RemoteData.notAsked())
+renderArticle(RemoteData.loading())
+renderArticle(RemoteData.of({ title: 'Foo' }))
+renderArticle(RemoteData.failure('404 Not found'))
 ```
+
+```notes
+RemoteData does the wrapping, etc.
+
+Provides helpers to match each cases
+and transform the content (only `Success`)
+```
+
 ---
 
 Map (map, then)
@@ -584,11 +609,90 @@ Fold (withDefault)
 ```ts
 <D, E, R>(fn: (d: D) => R) => (def: R) => (rd: RemoteData<D, E>) => R;
 ```
+
 ---
 
-<Link href="https://codesandbox.io/s/kx6q84nk5o" external size={4}>
-  Example
-</Link>
+<p>
+  <Link href="https://github.com/gillchristian/remote-data-ts" external size={5}>
+    gillchristian/remote-data-ts
+  </Link>
+</p>
+
+<p>
+  <Link href="https://codesandbox.io/s/kx6q84nk5o" external size={3}>
+    Example
+  </Link>
+</p>
+
+---
+
+## Pros
+
+- Declarative
+- Avoid spreading logic
+- Composable
+- Extendable
+- Safe
+
+## Cons
+
+- Verbose implementation / boilerplate
+
+export default Split
+
+```notes
+So ...
+```
+
+---
+
+## Many approaches
+
+<p>
+  <Link
+    href="https://blog.carbonfive.com/2018/01/08/an-introduction-to-adts-and-structural-pattern-matching-in-typescript"
+    external
+    size={3}
+  >
+    An Introduction to ADTs and Structural Pattern Matching in TypeScript
+  </Link>
+</p>
+
+<p>
+  <Link
+    href="https://pattern-matching-with-typescript.alabor.me"
+    external
+    size={3}
+  >
+    Pattern Matching with TypeScript
+  </Link>
+</p>
+
+<p>
+  <Link
+    href="https://blog.logrocket.com/pattern-matching-and-type-safety-in-typescript-1da1231a2e34"
+    external
+    size={3}
+  >
+    Pattern matching and type safety in TypeScript
+  </Link>
+</p>
+
+<p>
+  <Link
+    href="https://blog.parametricstudios.com/posts/pattern-matching-custom-data-types"
+    external
+    size={3}
+  >
+    Pattern Matching Custom Data Types in Typescript
+  </Link>
+</p>
+
+```notes
+I'm not the first one to talk about this
+
+Of course !!!
+```
 
 ---
 
@@ -596,4 +700,5 @@ Fold (withDefault)
 
 ---
 
-# THE END
+<Image src="https://media2.giphy.com/media/12Xe1PO7COWYrS/giphy.gif?cid=3640f6095c6550bb4447516255ff6046" />
+
